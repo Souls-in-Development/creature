@@ -1,0 +1,383 @@
+{
+  "python": {
+    "function": "def ${name}(${args}):\n    ${body}",
+    "class": "class ${Name}:\n    def __init__(self):\n        ${body}",
+    "for": "for ${item} in ${iterable}:\n    ${body}",
+    "if": "if ${cond}:\n    ${body}",
+    "while": "while ${cond}:\n    ${body}",
+    "import": "import ${module}",
+    "print": "print(${value})",
+    "try": "try:\n    ${body}\nexcept ${Exception} as e:\n    ${handler}"
+  },
+  "javascript": {
+    "function": "function ${name}(${args}) {\n    ${body}\n}",
+    "class": "class ${Name} {\n    constructor(${args}) {\n        ${body}\n    }\n}",
+    "for": "for (let ${i} = 0; ${i} < ${n}; ${i}++) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "import": "import { ${name} } from '${module}';",
+    "print": "console.log(${value});",
+    "try": "try {\n    ${body}\n} catch (${e}) {\n    ${handler}\n}"
+  },
+  "typescript": {
+    "function": "function ${name}(${args}): ${ret} {\n    ${body}\n}",
+    "class": "class ${Name} {\n    constructor(${args}) {\n        ${body}\n    }\n}",
+    "interface": "interface ${Name} {\n    ${member}: ${type};\n}",
+    "for": "for (let ${i} = 0; ${i} < ${n}; ${i}++) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "import": "import { ${name} } from '${module}';",
+    "print": "console.log(${value});",
+    "try": "try {\n    ${body}\n} catch (${e}) {\n    ${handler}\n}"
+  },
+  "java": {
+    "function": "${ret} ${name}(${args}) {\n    ${body}\n}",
+    "class": "public class ${Name} {\n    ${body}\n}",
+    "for": "for (int ${i} = 0; ${i} < ${n}; ${i}++) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "import": "import ${package};",
+    "print": "System.out.println(${value});",
+    "try": "try {\n    ${body}\n} catch (${Exception} e) {\n    ${handler}\n}"
+  },
+  "c": {
+    "function": "${ret} ${name}(${args}) {\n    ${body}\n}",
+    "struct": "struct ${Name} {\n    ${members}\n};",
+    "for": "for (int ${i} = 0; ${i} < ${n}; ${i}++) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "include": "#include <${header}>",
+    "print": "printf(\"${fmt}\\n\", ${args});"
+  },
+  "cpp": {
+    "function": "${ret} ${name}(${args}) {\n    ${body}\n}",
+    "class": "class ${Name} {\npublic:\n    ${body}\n};",
+    "for": "for (int ${i} = 0; ${i} < ${n}; ++${i}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "include": "#include <${header}>",
+    "print": "std::cout << ${value} << std::endl;",
+    "try": "try {\n    ${body}\n} catch (const ${Exception}& e) {\n    ${handler}\n}"
+  },
+  "csharp": {
+    "function": "${ret} ${Name}(${args})\n{\n    ${body}\n}",
+    "class": "public class ${Name}\n{\n    ${body}\n}",
+    "for": "for (int ${i} = 0; ${i} < ${n}; ${i}++)\n{\n    ${body}\n}",
+    "if": "if (${cond})\n{\n    ${body}\n}",
+    "while": "while (${cond})\n{\n    ${body}\n}",
+    "using": "using ${Namespace};",
+    "print": "Console.WriteLine(${value});",
+    "try": "try\n{\n    ${body}\n}\ncatch (${Exception} e)\n{\n    ${handler}\n}"
+  },
+  "go": {
+    "function": "func ${name}(${args}) ${ret} {\n    ${body}\n}",
+    "struct": "type ${Name} struct {\n    ${fields}\n}",
+    "for": "for ${i} := 0; ${i} < ${n}; ${i}++ {\n    ${body}\n}",
+    "if": "if ${cond} {\n    ${body}\n}",
+    "import": "import \"${package}\"",
+    "print": "fmt.Println(${value})",
+    "error": "if err != nil {\n    return ${err}\n}"
+  },
+  "rust": {
+    "function": "fn ${name}(${args}) -> ${ret} {\n    ${body}\n}",
+    "struct": "struct ${Name} {\n    ${field}: ${type},\n}",
+    "for": "for ${item} in ${iterable} {\n    ${body}\n}",
+    "if": "if ${cond} {\n    ${body}\n}",
+    "while": "while ${cond} {\n    ${body}\n}",
+    "use": "use ${path};",
+    "print": "println!(\"{}\", ${value});",
+    "match": "match ${value} {\n    ${pattern} => ${result},\n}"
+  },
+  "swift": {
+    "function": "func ${name}(${args}) -> ${ret} {\n    ${body}\n}",
+    "struct": "struct ${Name} {\n    ${body}\n}",
+    "class": "class ${Name} {\n    ${body}\n}",
+    "for": "for ${item} in ${sequence} {\n    ${body}\n}",
+    "if": "if ${cond} {\n    ${body}\n}",
+    "guard": "guard ${cond} else {\n    ${else}\n}",
+    "catch": "do {\n    ${body}\n} catch {\n    ${error}\n}",
+    "import": "import ${Module}",
+    "print": "print(${value})"
+  },
+  "ruby": {
+    "function": "def ${name}(${args})\n  ${body}\nend",
+    "class": "class ${Name}\n  def initialize(${args})\n    ${body}\n  end\nend",
+    "for": "${collection}.each do |${item}|\n  ${body}\nend",
+    "if": "if ${cond}\n  ${body}\nend",
+    "require": "require '${lib}'",
+    "print": "puts ${value}",
+    "try": "begin\n  ${body}\nrescue ${Exception} => e\n  ${handler}\nend"
+  },
+  "php": {
+    "function": "function ${name}(${args}) {\n    ${body}\n}",
+    "class": "class ${Name} {\n    ${body}\n}",
+    "for": "foreach (${array} as ${item}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "print": "echo ${value};",
+    "try": "try {\n    ${body}\n} catch (${Exception} $e) {\n    ${handler}\n}"
+  },
+  "kotlin": {
+    "function": "fun ${name}(${args}): ${ret} {\n    ${body}\n}",
+    "class": "class ${Name}(${args}) {\n    ${body}\n}",
+    "for": "for (${item} in ${collection}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "import": "import ${package}",
+    "print": "println(${value})",
+    "try": "try {\n    ${body}\n} catch (e: ${Exception}) {\n    ${handler}\n}"
+  },
+  "bash": {
+    "function": "${name}() {\n    ${body}\n}",
+    "for": "for ${i} in ${list}; do\n    ${body}\ndone",
+    "if": "if [ ${cond} ]; then\n    ${body}\nfi",
+    "while": "while [ ${cond} ]; do\n    ${body}\ndone",
+    "print": "echo \"${value}\"",
+    "case": "case ${var} in\n    ${pattern}) ${body} ;;\nesac"
+  },
+  "sql": {
+    "select": "SELECT ${cols}\nFROM ${table}\nWHERE ${cond};",
+    "insert": "INSERT INTO ${table} (${cols})\nVALUES (${vals});",
+    "update": "UPDATE ${table}\nSET ${col} = ${val}\nWHERE ${cond};",
+    "delete": "DELETE FROM ${table}\nWHERE ${cond};",
+    "create": "CREATE TABLE ${table} (\n    ${col} ${type}\n);",
+    "join": "SELECT ${cols}\nFROM ${a}\nJOIN ${b} ON ${a}.${key} = ${b}.${key};"
+  },
+  "scala": {
+    "function": "def ${name}(${args}): ${ret} = {\n  ${body}\n}",
+    "class": "class ${Name}(${args}) {\n  ${body}\n}",
+    "object": "object ${Name} {\n  ${body}\n}",
+    "for": "for (${item} <- ${collection}) {\n  ${body}\n}",
+    "if": "if (${cond}) {\n  ${body}\n}",
+    "match": "${value} match {\n  case ${pattern} => ${result}\n}",
+    "import": "import ${package}",
+    "print": "println(${value})"
+  },
+  "objc": {
+    "method": "- (${ret})${name}:(${type})${arg} {\n    ${body}\n}",
+    "interface": "@interface ${Name} : ${Super}\n${body}\n@end",
+    "implementation": "@implementation ${Name}\n${body}\n@end",
+    "for": "for (${type} ${item} in ${collection}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "import": "#import <${Framework}/${Header}.h>",
+    "property": "@property (nonatomic, ${attr}) ${type} ${name};",
+    "print": "NSLog(@\"${fmt}\", ${args});"
+  },
+  "perl": {
+    "sub": "sub ${name} {\n    my (${args}) = @_;\n    ${body}\n}",
+    "for": "foreach my $${item} (${list}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "use": "use ${Module};",
+    "print": "print \"${value}\\n\";"
+  },
+  "lua": {
+    "function": "function ${name}(${args})\n    ${body}\nend",
+    "for": "for ${i} = 1, ${n} do\n    ${body}\nend",
+    "forin": "for ${k}, ${v} in pairs(${table}) do\n    ${body}\nend",
+    "if": "if ${cond} then\n    ${body}\nend",
+    "while": "while ${cond} do\n    ${body}\nend",
+    "require": "local ${name} = require(\"${module}\")",
+    "print": "print(${value})"
+  },
+  "r": {
+    "function": "${name} <- function(${args}) {\n  ${body}\n}",
+    "for": "for (${i} in ${seq}) {\n  ${body}\n}",
+    "if": "if (${cond}) {\n  ${body}\n}",
+    "while": "while (${cond}) {\n  ${body}\n}",
+    "library": "library(${package})",
+    "print": "print(${value})"
+  },
+  "julia": {
+    "function": "function ${name}(${args})\n    ${body}\nend",
+    "struct": "struct ${Name}\n    ${field}::${Type}\nend",
+    "for": "for ${i} in ${iterable}\n    ${body}\nend",
+    "if": "if ${cond}\n    ${body}\nend",
+    "while": "while ${cond}\n    ${body}\nend",
+    "using": "using ${Module}",
+    "print": "println(${value})"
+  },
+  "haskell": {
+    "function": "${name} :: ${type}\n${name} ${args} = ${body}",
+    "data": "data ${Name} = ${Constructor} ${fields}",
+    "if": "if ${cond}\n    then ${then}\n    else ${else}",
+    "case": "case ${value} of\n    ${pattern} -> ${result}",
+    "let": "let ${name} = ${value}\nin ${body}",
+    "import": "import ${Module}",
+    "print": "putStrLn ${value}"
+  },
+  "ocaml": {
+    "function": "let ${name} ${args} = ${body}",
+    "type": "type ${name} = ${definition}",
+    "match": "match ${value} with\n| ${pattern} -> ${result}",
+    "if": "if ${cond} then ${then} else ${else}",
+    "let": "let ${name} = ${value} in\n${body}",
+    "print": "print_endline ${value}"
+  },
+  "fsharp": {
+    "function": "let ${name} ${args} =\n    ${body}",
+    "type": "type ${Name} =\n    { ${field}: ${Type} }",
+    "for": "for ${i} in ${seq} do\n    ${body}",
+    "if": "if ${cond} then\n    ${then}\nelse\n    ${else}",
+    "match": "match ${value} with\n| ${pattern} -> ${result}",
+    "open": "open ${Module}",
+    "print": "printfn \"%A\" ${value}"
+  },
+  "elixir": {
+    "function": "def ${name}(${args}) do\n  ${body}\nend",
+    "module": "defmodule ${Name} do\n  ${body}\nend",
+    "for": "for ${item} <- ${enumerable} do\n  ${body}\nend",
+    "if": "if ${cond} do\n  ${body}\nend",
+    "case": "case ${value} do\n  ${pattern} -> ${result}\nend",
+    "import": "import ${Module}",
+    "print": "IO.puts(${value})"
+  },
+  "erlang": {
+    "function": "${name}(${args}) ->\n    ${body}.",
+    "case": "case ${value} of\n    ${pattern} -> ${result}\nend",
+    "if": "if\n    ${cond} -> ${body}\nend",
+    "module": "-module(${name}).\n-export([${exports}]).",
+    "print": "io:format(\"${fmt}~n\", [${args}])."
+  },
+  "clojure": {
+    "function": "(defn ${name} [${args}]\n  ${body})",
+    "let": "(let [${name} ${value}]\n  ${body})",
+    "if": "(if ${cond}\n  ${then}\n  ${else})",
+    "for": "(doseq [${item} ${coll}]\n  ${body})",
+    "ns": "(ns ${name})",
+    "def": "(def ${name} ${value})",
+    "print": "(println ${value})"
+  },
+  "scheme": {
+    "define": "(define (${name} ${args})\n  ${body})",
+    "lambda": "(lambda (${args}) ${body})",
+    "let": "(let ((${name} ${value}))\n  ${body})",
+    "if": "(if ${cond}\n    ${then}\n    ${else})",
+    "cond": "(cond\n  (${test} ${result}))",
+    "print": "(display ${value})"
+  },
+  "lisp": {
+    "defun": "(defun ${name} (${args})\n  ${body})",
+    "let": "(let ((${name} ${value}))\n  ${body})",
+    "if": "(if ${cond}\n    ${then}\n    ${else})",
+    "loop": "(loop for ${i} from 0 below ${n}\n      do ${body})",
+    "defvar": "(defvar ${name} ${value})",
+    "print": "(format t \"${fmt}~%\" ${args})"
+  },
+  "dart": {
+    "function": "${ret} ${name}(${args}) {\n  ${body}\n}",
+    "class": "class ${Name} {\n  ${body}\n}",
+    "for": "for (var ${i} = 0; ${i} < ${n}; ${i}++) {\n  ${body}\n}",
+    "if": "if (${cond}) {\n  ${body}\n}",
+    "import": "import '${package}';",
+    "print": "print(${value});",
+    "try": "try {\n  ${body}\n} catch (${e}) {\n  ${handler}\n}"
+  },
+  "zig": {
+    "function": "fn ${name}(${args}) ${ret} {\n    ${body}\n}",
+    "struct": "const ${Name} = struct {\n    ${field}: ${type},\n};",
+    "for": "for (${slice}) |${item}| {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "import": "const ${name} = @import(\"${module}\");",
+    "print": "std.debug.print(\"${fmt}\\n\", .{${args}});"
+  },
+  "nim": {
+    "function": "proc ${name}(${args}): ${ret} =\n  ${body}",
+    "type": "type ${Name} = object\n  ${field}: ${Type}",
+    "for": "for ${item} in ${iterable}:\n  ${body}",
+    "if": "if ${cond}:\n  ${body}",
+    "while": "while ${cond}:\n  ${body}",
+    "import": "import ${module}",
+    "print": "echo ${value}"
+  },
+  "crystal": {
+    "function": "def ${name}(${args})\n  ${body}\nend",
+    "class": "class ${Name}\n  ${body}\nend",
+    "struct": "struct ${Name}\n  ${body}\nend",
+    "for": "${collection}.each do |${item}|\n  ${body}\nend",
+    "if": "if ${cond}\n  ${body}\nend",
+    "require": "require \"${lib}\"",
+    "print": "puts ${value}"
+  },
+  "d": {
+    "function": "${ret} ${name}(${args}) {\n    ${body}\n}",
+    "struct": "struct ${Name} {\n    ${body}\n}",
+    "class": "class ${Name} {\n    ${body}\n}",
+    "foreach": "foreach (${item}; ${range}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "import": "import ${module};",
+    "print": "writeln(${value});"
+  },
+  "fortran": {
+    "function": "function ${name}(${args})\n    ${body}\nend function ${name}",
+    "subroutine": "subroutine ${name}(${args})\n    ${body}\nend subroutine ${name}",
+    "do": "do ${i} = 1, ${n}\n    ${body}\nend do",
+    "if": "if (${cond}) then\n    ${body}\nend if",
+    "program": "program ${name}\n    ${body}\nend program ${name}",
+    "print": "print *, ${value}"
+  },
+  "pascal": {
+    "function": "function ${name}(${args}): ${ret};\nbegin\n  ${body}\nend;",
+    "procedure": "procedure ${name}(${args});\nbegin\n  ${body}\nend;",
+    "for": "for ${i} := 1 to ${n} do\nbegin\n  ${body}\nend;",
+    "if": "if ${cond} then\nbegin\n  ${body}\nend;",
+    "while": "while ${cond} do\nbegin\n  ${body}\nend;",
+    "print": "writeln(${value});"
+  },
+  "ada": {
+    "procedure": "procedure ${Name} (${args}) is\nbegin\n   ${body}\nend ${Name};",
+    "function": "function ${Name} (${args}) return ${Type} is\nbegin\n   ${body}\nend ${Name};",
+    "for": "for ${I} in ${range} loop\n   ${body}\nend loop;",
+    "if": "if ${cond} then\n   ${body}\nend if;",
+    "with": "with ${Package};",
+    "print": "Put_Line (${value});"
+  },
+  "groovy": {
+    "function": "def ${name}(${args}) {\n    ${body}\n}",
+    "class": "class ${Name} {\n    ${body}\n}",
+    "for": "for (${item} in ${collection}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "each": "${collection}.each { ${item} ->\n    ${body}\n}",
+    "import": "import ${package}",
+    "print": "println ${value}"
+  },
+  "powershell": {
+    "function": "function ${Name} {\n    param(${args})\n    ${body}\n}",
+    "for": "foreach (${item} in ${collection}) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "while": "while (${cond}) {\n    ${body}\n}",
+    "try": "try {\n    ${body}\n} catch {\n    ${handler}\n}",
+    "print": "Write-Output ${value}"
+  },
+  "vbnet": {
+    "function": "Function ${Name}(${args}) As ${Type}\n    ${body}\nEnd Function",
+    "sub": "Sub ${Name}(${args})\n    ${body}\nEnd Sub",
+    "class": "Public Class ${Name}\n    ${body}\nEnd Class",
+    "for": "For ${i} As Integer = 0 To ${n}\n    ${body}\nNext",
+    "if": "If ${cond} Then\n    ${body}\nEnd If",
+    "imports": "Imports ${Namespace}",
+    "print": "Console.WriteLine(${value})"
+  },
+  "matlab": {
+    "function": "function ${ret} = ${name}(${args})\n    ${body}\nend",
+    "for": "for ${i} = 1:${n}\n    ${body}\nend",
+    "if": "if ${cond}\n    ${body}\nend",
+    "while": "while ${cond}\n    ${body}\nend",
+    "switch": "switch ${var}\n    case ${value}\n        ${body}\nend",
+    "print": "disp(${value})"
+  },
+  "solidity": {
+    "function": "function ${name}(${args}) ${visibility} returns (${ret}) {\n    ${body}\n}",
+    "contract": "contract ${Name} {\n    ${body}\n}",
+    "struct": "struct ${Name} {\n    ${type} ${field};\n}",
+    "for": "for (uint ${i} = 0; ${i} < ${n}; ${i}++) {\n    ${body}\n}",
+    "if": "if (${cond}) {\n    ${body}\n}",
+    "mapping": "mapping(${key} => ${value}) public ${name};",
+    "event": "event ${Name}(${args});"
+  },
+  "assembly": {
+    "function": "${name}:\n    push rbp\n    mov rbp, rsp\n    ${body}\n    pop rbp\n    ret",
+    "loop": "${label}:\n    ${body}\n    dec ${reg}\n    jnz ${label}",
+    "if": "cmp ${a}, ${b}\n    jne ${label}\n    ${body}\n${label}:",
+    "data": "${name}: db ${value}",
+    "syscall": "mov rax, ${num}\n    syscall"
+  }
+}

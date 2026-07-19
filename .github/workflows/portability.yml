@@ -1,0 +1,94 @@
+name: portability
+
+# Proves the portable core actually builds off macOS, on real machines.
+#
+# WHY THIS EXISTS: the Apple-only pieces (MLX inference, the SwiftUI IDE) are
+# compiled away off Apple, and everything else — the trunk, universal indexing,
+# the green probes, the chat engine driving a local model server — is meant to
+# build anywhere. That claim is only worth anything if a machine checks it.
+#
+# A macOS cross-compile got as far as producing a real Linux ELF binary, but
+# could not RUN it, and cannot target Windows at all (no Windows SDK to
+# cross-compile against from macOS). These jobs close both gaps.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    name: Linux (build + test)
+    runs-on: ubuntu-latest
+    # The official Swift image pins the toolchain, so this does not depend on a
+    # third-party setup action keeping pace with releases.
+    container: swift:6.2.3
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Install language toolchains the probes and tests use
+        # python3: the Python tentacle's AST path. Without it those suites skip
+        # (they degrade honestly rather than fail), but skipping means the AST
+        # path goes untested on Linux — so install it and actually exercise it.
+        # The others let the earned-green probes return real verdicts instead of
+        # UNKNOWN, which is the interesting case to cover.
+        run: |
+          apt-get update -qq
+          apt-get install -y -qq python3 ruby nodejs file >/dev/null
+          python3 --version && ruby --version && node --version
+
+      - name: Build
+        # MLX and the IDE compile to nothing here; everything else must build.
+        run: swift build
+
+      - name: Test
+        # The suite is offline-safe: no model, no network. The external-validator
+        # probes degrade to UNKNOWN when a language's tool is absent, which is
+        # the honest result rather than a failure.
+        run: swift test
+
+      - name: Prove the binary runs
+        # Not inference — that needs a model server. This proves the produced
+        # Linux binary actually executes, which cross-compiling could not show.
+        run: |
+          swift build --show-bin-path
+          "$(swift build --show-bin-path)/creature" --version
+          "$(swift build --show-bin-path)/creature" help
+
+      - name: Prove the engine works — index a polyglot workspace
+        # The real payload: universal indexing on Linux. Creates a mixed-language
+        # workspace and checks the trunk picks all of it up.
+        run: |
+          mkdir -p /tmp/poly
+          printf 'fn add(a: i32, b: i32) -> i32 { a + b }\n' > /tmp/poly/lib.rs
+          printf 'function greet(n) { return n; }\n'          > /tmp/poly/app.js
+          printf 'def add(a, b):\n    return a + b\n'         > /tmp/poly/m.py
+          printf 'func Add(a int, b int) int { return a + b }\n' > /tmp/poly/main.go
+          "$(swift build --show-bin-path)/creature" context /tmp/poly "add"
+
+  windows:
+    name: Windows (build)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: compnerd/gha-setup-swift@main
+        with:
+          branch: swift-6.2.3-release
+          tag: 6.2.3-RELEASE
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build
+
+      - name: Prove the binary runs
+        run: |
+          swift build --show-bin-path
+          $bin = swift build --show-bin-path
+          & "$bin\creature.exe" --version

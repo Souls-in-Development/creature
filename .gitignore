@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+build/
+.swiftpm/
+xcuserdata/
+*.atlas
+
+# Release packaging (scripts/package-release.sh)
+dist/
+.release-build/
+bin/

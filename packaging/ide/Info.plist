@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Info.plist template for Creature.app. scripts/package-ide.sh substitutes
+     __VERSION__ before copying it into the bundle. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Creature</string>
+    <key>CFBundleDisplayName</key>
+    <string>Creature</string>
+    <key>CFBundleIdentifier</key>
+    <string>dev.soulsin.creature-ide</string>
+    <key>CFBundleExecutable</key>
+    <string>creature-ide</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>__VERSION__</string>
+    <key>CFBundleVersion</key>
+    <string>__VERSION__</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <!-- A regular app: shows in the Dock and owns a menu bar. Without a bundle
+         (a bare executable) a SwiftUI app launches as an accessory with no Dock
+         presence and no reliable key-window focus — this is what makes it a real
+         app. -->
+    <key>LSUIElement</key>
+    <false/>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.developer-tools</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Souls in Development. AGPLv3.</string>
+    <!-- The creature reads workspace directories the user points it at; declaring
+         intent keeps the sandbox/TCC prompts truthful if a hardened runtime is
+         added later. -->
+    <key>NSDesktopFolderUsageDescription</key>
+    <string>Creature indexes the workspace folder you open.</string>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Creature indexes the workspace folder you open.</string>
+</dict>
+</plist>

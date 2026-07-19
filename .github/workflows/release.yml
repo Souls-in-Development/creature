@@ -1,0 +1,207 @@
+name: release
+
+# Tag-driven release: v0.1.0 -> build, package, publish, bump the tap formula.
+#
+#   git tag v0.1.0 && git push origin v0.1.0
+#
+# RUNNER CHOICE (macos-26, not macos-latest or macos-14):
+#   - macos-14 began deprecation on 2026-07-06 and is unsupported from 2026-11-02.
+#   - macOS 15 images carry Xcode 16.x only; this package is swift-tools-version 6.1
+#     and MLX needs the macOS 26 SDK, so Xcode 26 is required.
+#   - macos-26 is arm64 and ships Xcode 26.x. arm64 is mandatory: MLX is Metal-only,
+#     there is no Intel build, and a cross-built x86_64 binary would be useless.
+#   `macos-latest` is deliberately avoided — it moved to macos-26 in June 2026 and
+#   will move again; a release pipeline should not silently change compilers.
+#
+# WHAT CI CANNOT DO — read before trusting a green run:
+#   GitHub's hosted macOS runners are virtualised and expose no Metal device, so
+#   MLX cannot run a model here (ml-explore/mlx#3148). CI builds the metallib
+#   (a compile-time step, no GPU needed) and verifies the payload's shape, but it
+#   CANNOT prove the binary generates. That gate only runs on real Apple Silicon:
+#   scripts/package-release.sh does it by default when run locally.
+#   A green release run means "it built and is well-formed", NOT "it works".
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release (e.g. v0.1.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      sha256: ${{ steps.package.outputs.sha256 }}
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Resolve version from tag
+        id: version
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing $TAG (version $VERSION)"
+
+      - name: Verify toolchain
+        run: |
+          # Assert rather than pin: GitHub replaces Xcode patch versions on these
+          # images, so a hard pin rots. We only care that it is Xcode 26+.
+          XCODE_VERSION="$(xcodebuild -version | head -1 | awk '{print $2}')"
+          XCODE_MAJOR="${XCODE_VERSION%%.*}"
+          echo "Xcode $XCODE_VERSION on $(sw_vers -productVersion) ($(uname -m))"
+          if [ "$XCODE_MAJOR" -lt 26 ]; then
+            echo "::error::Xcode 26+ required (found $XCODE_VERSION). MLX needs the macOS 26 SDK."
+            exit 1
+          fi
+          if [ "$(uname -m)" != "arm64" ]; then
+            echo "::error::Runner is $(uname -m), not arm64. MLX is Metal-only; an Intel build cannot ship."
+            exit 1
+          fi
+
+      - name: Test
+        run: swift test
+
+      - name: Build and package
+        id: package
+        env:
+          # Mandatory here: no Metal device on hosted runners, so the packaging
+          # script's generation check cannot run. See the header note above.
+          SKIP_INFERENCE_CHECK: "1"
+        run: |
+          ./scripts/package-release.sh "${{ steps.version.outputs.version }}"
+          NAME="creature-${{ steps.version.outputs.version }}-macos-arm64"
+          SHA="$(awk '{print $1}' < "dist/$NAME.tar.gz.sha256")"
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Verify the payload is well-formed
+        run: |
+          # The most valuable thing CI *can* check without a GPU: that the
+          # artifact contains the metallib. Its absence is invisible until a
+          # user runs a model, at which point it fails with a bare
+          # "Failed to load the default metallib".
+          NAME="${{ steps.package.outputs.name }}"
+          WORK="$(mktemp -d)"
+          tar -xzf "dist/$NAME.tar.gz" -C "$WORK"
+          METALLIB="$WORK/$NAME/mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib"
+          if [ ! -f "$METALLIB" ]; then
+            echo "::error::default.metallib is missing — this artifact cannot run a model. Refusing to publish."
+            exit 1
+          fi
+          test -f "$WORK/$NAME/LICENSE" || { echo "::error::LICENSE missing; AGPLv3 §4 requires it to ship with the binary."; exit 1; }
+          # --version needs no GPU, so it is a safe liveness check even here.
+          ACTUAL="$("$WORK/$NAME/creature" --version)"
+          echo "Binary reports: $ACTUAL"
+          [ "$ACTUAL" = "creature ${{ steps.version.outputs.version }}" ] || {
+            echo "::error::Version mismatch: binary says '$ACTUAL', tag says ${{ steps.version.outputs.version }}"
+            exit 1
+          }
+          echo "metallib present, licence present, version matches"
+
+      # --- Signing / notarisation ------------------------------------------
+      # Deliberately absent, not forgotten.
+      #
+      # The CLI does not need it. Gatekeeper acts on the com.apple.quarantine
+      # xattr, which is set by LaunchServices when a browser downloads a file.
+      # brew and curl do not set it, so an unsigned CLI installed by either
+      # raises no prompt and needs no Developer ID.
+      #
+      # The IDE .app is a different story: it WILL be quarantined on browser
+      # download, and notarising it needs a "Developer ID Application"
+      # certificate (paid Apple Developer Program). Add that step to the IDE's
+      # own workflow when the cert exists — not here.
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NAME="${{ steps.package.outputs.name }}"
+          # No --notes-start-tag: on the first release there is no previous tag
+          # to diff against, and passing an empty value is an error.
+          if gh release view "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Release already exists — uploading assets to it."
+            gh release upload "${{ steps.version.outputs.tag }}" \
+              "dist/$NAME.tar.gz" \
+              "dist/$NAME.tar.gz.sha256" --clobber
+          else
+            gh release create "${{ steps.version.outputs.tag }}" \
+              --title "creature ${{ steps.version.outputs.version }}" \
+              --generate-notes \
+              "dist/$NAME.tar.gz" \
+              "dist/$NAME.tar.gz.sha256"
+          fi
+
+  bump-formula:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for tap token
+        id: guard
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        run: |
+          # GITHUB_TOKEN cannot write to another repo, so the tap bump needs a PAT
+          # (secrets.TAP_GITHUB_TOKEN) with contents:write on Souls-in-Development/homebrew-tap.
+          # Without it, skip loudly rather than fail the release that already shipped.
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "::warning::TAP_GITHUB_TOKEN is not set — the tap was NOT updated. Bump Formula/creature.rb by hand."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.guard.outputs.skip == 'false'
+        with:
+          repository: Souls-in-Development/homebrew-tap
+          token: ${{ secrets.TAP_GITHUB_TOKEN }}
+          path: tap
+
+      - uses: actions/checkout@v7
+        if: steps.guard.outputs.skip == 'false'
+        with:
+          path: creature
+
+      - name: Update formula
+        if: steps.guard.outputs.skip == 'false'
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          SHA="${{ needs.release.outputs.sha256 }}"
+          URL="https://github.com/Souls-in-Development/creature/releases/download/v$VERSION/creature-$VERSION-macos-arm64.tar.gz"
+
+          # The canonical formula lives in the creature repo; the tap is a publish
+          # target. Copy it, then substitute the three release-specific fields.
+          cp creature/packaging/homebrew/creature.rb tap/Formula/creature.rb
+          cd tap
+          sed -i "s|^  url \".*\"|  url \"$URL\"|" Formula/creature.rb
+          sed -i "s|^  version \".*\"|  version \"$VERSION\"|" Formula/creature.rb
+          sed -i "s|^  sha256 \".*\"|  sha256 \"$SHA\"|" Formula/creature.rb
+
+          # Fail loudly if the substitutions did not take, rather than pushing a
+          # formula that silently points at the previous release.
+          grep -q "$SHA" Formula/creature.rb || { echo "::error::sha256 substitution failed"; exit 1; }
+          grep -q "$URL" Formula/creature.rb || { echo "::error::url substitution failed"; exit 1; }
+
+          if git diff --quiet; then
+            echo "Formula already current — nothing to push."
+            exit 0
+          fi
+
+          git config user.name "Souls in Development"
+          git config user.email "206266062+A-stag-across-the-nevernever@users.noreply.github.com"
+          git add Formula/creature.rb
+          git commit -m "creature $VERSION"
+          git push
