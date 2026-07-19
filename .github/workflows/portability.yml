@@ -72,7 +72,12 @@ jobs:
 
   windows:
     name: Windows (build)
-    runs-on: windows-latest
+    # NOT windows-latest: that image now ships Visual Studio 18, whose MSVC STL
+    # headers reject Swift 6.2.3's bundled Clang outright —
+    #   error STL1000: Unexpected compiler version, expected Clang 20 or newer
+    # windows-2022 carries a VS whose STL the toolchain can actually compile
+    # against. Revisit when the Swift toolchain catches up.
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v7
 

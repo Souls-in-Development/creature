@@ -102,8 +102,26 @@ public struct PersistentStore: Sendable {
         try handle.synchronize()
         try handle.close()
 
-        // Atomic replace
-        _ = try FileManager.default.replaceItemAt(fileURL, withItemAt: tempURL)
+        // Atomic replace.
+        //
+        // NOT `FileManager.replaceItemAt`: on Darwin it atomically swaps, but
+        // swift-corelibs-foundation implements it differently and the file does
+        // not land when the destination does not already exist — so every first
+        // save silently produced nothing on Linux, and the read back failed with
+        // "file doesn't exist". Call rename(2) directly instead: it is atomic,
+        // it overwrites, and it is what Darwin's implementation ultimately does,
+        // so the behaviour is now identical on both.
+        #if canImport(Darwin) || canImport(Glibc)
+        guard rename(tempURL.path, fileURL.path) == 0 else {
+            try? FileManager.default.removeItem(at: tempURL)
+            throw PersistentStoreError.writeFailed
+        }
+        #else
+        // Windows' rename refuses an existing destination, so clear it first.
+        // Not atomic, but it is the only option the platform offers here.
+        try? FileManager.default.removeItem(at: fileURL)
+        try FileManager.default.moveItem(at: tempURL, to: fileURL)
+        #endif
 
         // Fsync directory to ensure the rename is durable
         syncDirectory(at: directory)
