@@ -45,15 +45,6 @@ let package = Package(
             name: "CreatureSpine",
             dependencies: [
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux, .windows, .android]))
-            ],
-            exclude: [
-                "CHANGELOG.atlas",
-                "Auth/CHANGELOG.atlas",
-                "Bridge/CHANGELOG.atlas",
-                "Colour/CHANGELOG.atlas",
-                "Identity/CHANGELOG.atlas",
-                "Signal/CHANGELOG.atlas",
-                "Sync/CHANGELOG.atlas"
             ]
         ),
         // Portable: learned routing + the Foundation (Apple Intelligence) oracle.
@@ -171,8 +162,7 @@ let package = Package(
         ),
         .executableTarget(
             name: "CreatureCLI",
-            dependencies: ["CreatureChat", "CreatureWorkspace", "CreatureSpine", "CreatureInference", .target(name: "CreatureMLX", condition: .when(platforms: [.macOS, .iOS])), "CreatureTrunk", "CreatureTrunkSwift", "CreatureTrunkPython", "CreatureTrunkFoundation", "CreatureSnippets", "CreatureKeys"],
-            exclude: ["CHANGELOG.atlas"]
+            dependencies: ["CreatureChat", "CreatureWorkspace", "CreatureSpine", "CreatureInference", .target(name: "CreatureMLX", condition: .when(platforms: [.macOS, .iOS])), "CreatureTrunk", "CreatureTrunkSwift", "CreatureTrunkPython", "CreatureTrunkFoundation", "CreatureSnippets", "CreatureKeys"]
         ),
         .executableTarget(
             name: "CreatureIDE",
@@ -180,8 +170,7 @@ let package = Package(
         ),
         .testTarget(
             name: "CreatureSpineTests",
-            dependencies: ["CreatureSpine"],
-            exclude: ["CHANGELOG.atlas"]
+            dependencies: ["CreatureSpine"]
         ),
         .testTarget(
             name: "CreatureTrunkTests",

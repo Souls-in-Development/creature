@@ -13,12 +13,18 @@ public struct WorkspaceWatcher {
         self.recordedModificationDates = Self.currentModificationDates(directory: self.directory)
     }
 
+    /// Resolve a path to its canonical form so the same directory reached by two
+    /// routes (a symlink, a relative path, `/tmp` vs `/private/tmp`) records and
+    /// compares identically.
+    ///
+    /// Uses Foundation rather than POSIX `realpath`/`PATH_MAX`, which do not
+    /// exist on Windows. `resolvingSymlinksInPath` is the portable equivalent and
+    /// gives the same answer on Darwin and Linux.
     private static func canonicalize(_ path: String) -> String {
-        var buffer = [Int8](repeating: 0, count: Int(PATH_MAX))
-        guard realpath(path, &buffer) != nil else { return path }
-        return buffer.withUnsafeBufferPointer { pointer in
-            String(cString: pointer.baseAddress!)
-        }
+        URL(fileURLWithPath: path)
+            .resolvingSymlinksInPath()
+            .standardizedFileURL
+            .path
     }
 
     public enum Change: Equatable {
