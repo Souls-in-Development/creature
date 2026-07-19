@@ -2,6 +2,8 @@
 
 **A living terminal. The vessel before the soul.** — [soulsin.dev](https://soulsin.dev)
 
+[![portability](https://github.com/Souls-in-Development/creature/actions/workflows/portability.yml/badge.svg)](https://github.com/Souls-in-Development/creature/actions/workflows/portability.yml)
+
 `creature` is an AI-agnostic terminal that runs language models — **your** models. It runs them
 in-process on Apple Silicon (no Ollama, no LM Studio, no server), or connects to any
 OpenAI-compatible endpoint. Bring your own soul(s).
@@ -20,10 +22,12 @@ OpenAI-compatible endpoint. Bring your own soul(s).
 >   checker you have installed.
 > - Linux: builds and runs, verified in a container. There it drives a local
 >   [Ollama](https://ollama.com) instead of running the model itself.
+> - Windows: builds, and the binary starts. CI compiles it on every push.
 >
 > **What doesn't, or is unproven**
-> - **Windows is untested.** It should build — nothing Apple-specific is left in the core — but
->   nobody has run it. If you try, I want to hear either way.
+> - **Windows is barely tested.** CI proves it compiles and the binary runs — nothing more. No
+>   test suite, no indexing run, no chat session has been exercised there. If you try it, I want
+>   to hear either way. Expect the path handling to be where it breaks first.
 > - **The IDE is early.** The file tree, status and chat work; the editor is currently
 >   **read-only** — no editing, no syntax highlighting.
 > - **Nothing is notarised or signed** with an Apple Developer ID, so macOS will warn you about
