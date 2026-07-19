@@ -32,8 +32,10 @@ OpenAI-compatible endpoint. Bring your own soul(s).
 >   **read-only** — no editing, no syntax highlighting.
 > - **Nothing is notarised or signed** with an Apple Developer ID, so macOS will warn you about
 >   the `.app`. The command-line tool is unaffected.
-> - **No Homebrew tap or installer yet** — those exist in this repo but aren't published, so
->   build from source for now.
+> - **The install paths are one release old.** `brew` and `curl` both work and were verified
+>   generating on a real machine — but v0.1.0 is the first release either has ever produced, and
+>   the first install of it was broken (it shipped a symlink MLX couldn't see through). Assume
+>   more of that.
 > - Only Swift and Python get real AST-quality indexing. Every other language is regex-level, and
 >   deliberately reports UNKNOWN rather than claiming green.
 >
@@ -86,21 +88,23 @@ Then:
 > something runnable. (If you do run a `swift build` binary, it tells you this rather than
 > crashing.)
 
-<details>
-<summary>Homebrew / curl (not published yet)</summary>
+## Install
 
-The tap and installer are written and tested but **not live** — the public repos don't exist yet,
-so these will 404 until release:
+Either of these installs a pre-built binary — no Xcode needed. Both were installed and run on a
+real machine before being written down here.
 
 ```sh
 brew install Souls-in-Development/tap/creature
-curl -fsSL https://soulsin.dev/install.sh | sh
 ```
 
-Both install a pre-built binary. Neither sets macOS's quarantine flag, so there's no Gatekeeper
-prompt. See `packaging/` and `scripts/`.
+```sh
+curl -fsSL https://raw.githubusercontent.com/Souls-in-Development/creature/main/scripts/install.sh | sh
+```
 
-</details>
+Neither sets macOS's quarantine flag, so there's no Gatekeeper prompt. `CREATURE_PREFIX` picks the
+install location for the curl route (default `/usr/local`). See `packaging/` and `scripts/`.
+
+> The short `soulsin.dev/install.sh` URL isn't wired up yet — use the raw one above.
 
 ## Quickstart
 

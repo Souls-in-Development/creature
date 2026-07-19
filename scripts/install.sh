@@ -98,7 +98,14 @@ tar -xzf "$TMP/$NAME.tar.gz" -C "$TMP" || die "could not extract the archive."
 
 # The binary resolves its resource bundles (including the metallib that makes
 # generation possible) relative to itself, so the payload is installed whole
-# into libexec and exposed via a symlink — never copy the binary alone.
+# into libexec — never copy the binary alone.
+#
+# It is exposed through an exec script, NOT a symlink. MLX looks for its
+# bundles next to the executable path without resolving symlinks first, so a
+# symlinked bin/creature searches bin/ (no bundles there) and dies on the first
+# generation with a bare "Failed to load the default metallib". `--version`
+# still works through a symlink, which is what makes this so easy to ship
+# broken — it was, in 0.1.0.
 LIBEXEC="$PREFIX/libexec/creature"
 BINDIR="$PREFIX/bin"
 
@@ -119,7 +126,9 @@ log "installing to $PREFIX"
 $SUDO mkdir -p "$LIBEXEC" "$BINDIR" || die "could not create $LIBEXEC"
 $SUDO rm -rf "${LIBEXEC:?}/"* 2>/dev/null || true
 $SUDO cp -R "$TMP/$NAME/"* "$LIBEXEC/" || die "could not copy files into $LIBEXEC"
-$SUDO ln -sf "$LIBEXEC/creature" "$BINDIR/creature" || die "could not link $BINDIR/creature"
+printf '#!/bin/sh\nexec "%s/creature" "$@"\n' "$LIBEXEC" > "$TMP/creature-exec"
+$SUDO cp "$TMP/creature-exec" "$BINDIR/creature" || die "could not write $BINDIR/creature"
+$SUDO chmod 755 "$BINDIR/creature" || die "could not make $BINDIR/creature executable"
 
 # --- report ----------------------------------------------------------------
 

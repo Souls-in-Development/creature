@@ -29,11 +29,21 @@ class Creature < Formula
     # NOT `bin.install "creature"`. The binary resolves its resources
     # (Bundle.module) relative to its own location, and mlx-swift_Cmlx.bundle
     # carries default.metallib. A lone binary in bin/ cannot find it and dies on
-    # the first generation. Keep the payload together in libexec and expose it
-    # through a symlink — verified to resolve correctly through the symlink.
+    # the first generation. Keep the payload together in libexec.
     libexec.install "creature"
     libexec.install Dir["*.bundle"]
-    bin.install_symlink libexec/"creature"
+
+    # AND NOT `bin.install_symlink` either. MLX resolves the metallib from the
+    # executable path WITHOUT resolving symlinks, so through a symlink it looks
+    # in bin/ — where there are no bundles — and dies with a bare
+    # "Failed to load the default metallib". An exec script is the fix: the
+    # process that ends up running is the real libexec binary, so the lookup
+    # starts in the right directory.
+    #
+    # Measured on 0.1.0, brew-installed: direct libexec path generates; the
+    # same build through the symlink fails. `--version` works either way, which
+    # is exactly why the test block below is not sufficient on its own.
+    bin.write_exec_script libexec/"creature"
 
     prefix.install "LICENSE"
     doc.install "README.md"
@@ -60,5 +70,14 @@ class Creature < Formula
     # metallib is the thing most likely to be silently dropped by a packaging
     # change, and its absence is invisible until someone runs a model.
     assert_path_exists libexec/"mlx-swift_Cmlx.bundle/Contents/Resources/default.metallib"
+
+    # Present is not the same as reachable. 0.1.0 shipped with the metallib in
+    # the right place and still could not load it, because bin/creature was a
+    # symlink and MLX does not resolve those before looking for its bundles.
+    # Assert the exec-script shape that fixes it — running a model here would
+    # need a GPU and a 1.6 GB download, so this is the most the test block can
+    # honestly check.
+    refute_predicate bin/"creature", :symlink?
+    assert_match libexec.to_s, (bin/"creature").read
   end
 end
